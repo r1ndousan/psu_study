@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TODO List</title>
+  </head>
+  <body>
+    <h1>TODO List</h1>
+    <button onclick="getList()">Получить список</button>
+    <table id="todoTable">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Пользователь</th>
+          <th>Задача</th>
+          <th>Выполнено</th>
+        </tr>
+      </thead>
+      <tbody id="todoBody"></tbody>
+    </table>
+
+    <script>
+      function getList() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://jsonplaceholder.typicode.com/todos", true);
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const todos = JSON.parse(xhr.responseText);
+            const users = JSON.parse(getUsers());
+            const todoBody = document.getElementById("todoBody");
+
+            for (let i = 0; i < todos.length; i++) {
+              const user = users.find((user) => user.id === todos[i].userId);
+              const row =
+                "<tr>" +
+                "<td>" +
+                (i + 1) +
+                "</td>" +
+                "<td>" +
+                user.name +
+                "</td>" +
+                "<td>" +
+                todos[i].title +
+                "</td>" +
+                "<td><input type='checkbox' " +
+                (todos[i].completed ? "checked" : "") +
+                " disabled/></td>" +
+                "</tr>";
+              todoBody.insertAdjacentHTML("beforeend", row);
+            }
+          } else {
+            console.error("Failed to fetch data");
+          }
+        };
+        xhr.send();
+      }
+
+      function getUsers() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://jsonplaceholder.typicode.com/users", false);
+        xhr.send();
+        return xhr.responseText;
+      }
+    </script>
+  </body>
+</html>
